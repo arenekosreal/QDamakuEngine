@@ -37,8 +37,16 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="config.json" />
+    <Content Include="lang\zh_CN\qt_zh_CN.qm" />
+    <Content Include="lang\zh_CN\widgets_zh_CN.qm" />
+    <Content Include="lang\zh_CN\zh_CN.json" />
     <Content Include="requirements.txt" />
-    <Content Include="zh_CN.json" />
+    <Content Include="resources\program.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="lang\" />
+    <Folder Include="lang\zh_CN\" />
+    <Folder Include="resources\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

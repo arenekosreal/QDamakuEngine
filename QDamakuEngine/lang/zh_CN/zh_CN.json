@@ -10,6 +10,9 @@
     },
     "ui": {
         "notification_title": "启动成功！",
-        "notification_msg": "程序已进入后台，右击图标可打开菜单。"
+        "notification_msg": "程序已进入后台，右击图标可打开菜单。",
+        "exit_menu": "退出(&E)",
+        "setting_menu": "设置(&S)",
+        "tooltip": "QDamakuEngine"
     }
 }
