@@ -1,6 +1,15 @@
 {
-    "error": 
-    {
+    "error": {
         "platform_error": "当前运行平台错误！请确认当前运行平台是Windows平台，否则可能会出现不可预料的错误！"
+    },
+    "warning": {
+        "platform_warning": "警告：当前平台不是Windows 8以上的平台，无法使用toast通知！"
+    },
+    "info": {
+        "loaded_conf": "读取配置文件完成！"
+    },
+    "ui": {
+        "notification_title": "启动成功！",
+        "notification_msg": "程序已进入后台，右击图标可打开菜单。"
     }
 }
