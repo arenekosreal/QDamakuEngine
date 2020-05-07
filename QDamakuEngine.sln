@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30011.22
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "QDamakuEngine", "QDamakuEngine\QDamakuEngine.pyproj", "{05B2110B-9FFE-495F-9C6A-B1591892EE2A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{05B2110B-9FFE-495F-9C6A-B1591892EE2A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05B2110B-9FFE-495F-9C6A-B1591892EE2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6C7C985E-B175-4E2B-9EDB-DD8DAB2ED138}
+	EndGlobalSection
+EndGlobal
