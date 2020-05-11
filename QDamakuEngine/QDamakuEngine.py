@@ -129,13 +129,13 @@ class SettingDialog(QDialog):
 		self.lang_chooser.setFont(font)
 		self.lang_chooser.setStyleSheet("QComboBox{border:1px solid gray;width:60px;border-radius:10px;padding:2px 4px;background:#00CED1;}QComboBox:drop-down{subcontrol-origin:padding;subcontrol-position:top right;border-top-right-radius:10px;border-bottom-right-radius:10px;border-top-left-radius:10px;border-bottom-left-radius:10px;}QComboBox:down-arrow{image:url(resources/downarrow.png);width:15px;height:15px;}QComboBox:down-arrow:on{image:url(resources/uparrow.png);}")
 		self.lang_chooser.addItems(lang_list)
-		self.lang_chooser.setCurrentIndex(lang_list.index(setting.lang_))
+		self.lang_chooser.setCurrentIndex(self.lang_code_list.index(setting.lang_))
 		font_label=QLabel(lang.setting_ui.font_label)
 		font_label.setFont(font)
 		font_label.setStyleSheet("QLabel{border:1px solid gray;width:15px;border-radius:10px;padding:2px 4px;background:#00CED1;}")
 		self.font_chooser=QFontComboBox()
 		self.font_chooser.setFont(font)
-		#self.font_chooser.setStyleSheet("QFontComboBox{border:1px solid gray;width:60px;border-radius:10px;padding:2px 4px;background:#00CED1;}QFontComboBox:drop-down{subcontrol-origin:padding;subcontrol-position:top right;border-top-right-radius:10px;border-bottom-right-radius:10px;border-top-left-radius:10px;border-bottom-left-radius:10px;}QFontCombpBox:down-arrow{image:url(resources/downarrow.png);width:15px;height:15px;}QFontComboBox:down-arrow:on{image:url(resources/uparrow.png);")
+		self.font_chooser.setStyleSheet("QFontComboBox{border:1px solid gray;width:60px;border-radius:10px;padding:2px 4px;background:#00CED1;}QFontComboBox:drop-down{subcontrol-origin:padding;subcontrol-position:top right;border-top-right-radius:10px;border-bottom-right-radius:10px;border-top-left-radius:10px;border-bottom-left-radius:10px;}QFontComboBox:down-arrow{image:url(resources/downarrow.png);width:15px;height:15px;}QFontComboBox:down-arrow:on{image:url(resources/uparrow.png);}")
 		self.font_chooser.setFontFilters(QFontComboBox.AllFonts)
 		self.font_chooser.setCurrentFont(setting.damaku_font)
 		font_size_label=QLabel(lang.setting_ui.font_size)
@@ -232,9 +232,10 @@ class SettingDialog(QDialog):
 			for name in files:
 				with open(file=os.path.join(root,name),mode="r",encoding="utf-8") as lang_reader:
 					if name.endswith(".json"):
-						lang_list.append(str(json.load(lang_reader)["code"]))
+						lang_dict=json.load(lang_reader)
+						lang_list.append(str(lang_dict["name"]))
 						lang_files.append(str(os.path.join(root,name)))
-						self.lang_code_list.append(name.replace(".json",""))
+						self.lang_code_list.append(str(lang_dict["code"]))
 		return lang_list,lang_files
 	def get_fixed_value(self,index:int):
 		if index==0:
@@ -250,7 +251,6 @@ class SettingDialog(QDialog):
 class TrayIcon(QSystemTrayIcon):
 	def __init__(self):
 		super(TrayIcon,self).__init__()
-		#QApplication.setQuitOnLastWindowClosed(False)
 		self.tray_menu=QMenu()
 		action_exit=QAction(QIcon("resources/exit.png"),lang.notification.exit_menu,self)
 		action_exit.triggered.connect(self.quit_program)
@@ -266,9 +266,10 @@ class TrayIcon(QSystemTrayIcon):
 		self.setVisible(True)
 		logging.debug(lang.debug.finished_creating_menu)
 	def quit_program(self):
+		self.setVisible(False)
 		logging.info(lang.info.closed_tray)
-		self.deleteLater()
 		qApp.quit()
+		self.deleteLater()
 		sys.exit()
 	def show_setting_ui(self):
 		setting_dialog=SettingDialog()
@@ -281,6 +282,7 @@ class main_window(QMainWindow):
 		self.setWindowOpacity(0.95)
 		self.setAttribute(Qt.WA_TranslucentBackground)
 		self.setWindowFlag(Qt.FramelessWindowHint)
+		self.setWindowFlag(Qt.Tool)
 		screen=QApplication.desktop()
 		screen_size=QSize(screen.width(),screen.height())
 		self.raise_()
