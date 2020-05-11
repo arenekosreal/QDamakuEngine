@@ -1,4 +1,9 @@
 {
-    "lang": "zh_CN" 
-
+    "lang": "zh_CN" ,
+    "font": "Microsoft YaHei",
+    "font_size": 15,
+    "font_speed": 100,
+    "font_weight": 50,
+    "font_italic": 0,
+    "font_bold": 0
 }

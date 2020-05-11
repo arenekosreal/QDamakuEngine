@@ -12,6 +12,11 @@
     <Name>QDamakuEngine</Name>
     <RootNamespace>QDamakuEngine</RootNamespace>
     <InterpreterId>MSBuild|QDEEnv|$(MSBuildProjectFullPath)</InterpreterId>
+    <LaunchProvider>Standard Python launcher</LaunchProvider>
+    <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
+    <TestFramework>pytest</TestFramework>
+    <UnitTestPattern>test*.py</UnitTestPattern>
+    <UnitTestRootDirectory>.</UnitTestRootDirectory>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -41,7 +46,9 @@
     <Content Include="lang\zh_CN\widgets_zh_CN.qm" />
     <Content Include="lang\zh_CN\zh_CN.json" />
     <Content Include="requirements.txt" />
+    <Content Include="resources\exit.png" />
     <Content Include="resources\program.ico" />
+    <Content Include="resources\setting.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="lang\" />
