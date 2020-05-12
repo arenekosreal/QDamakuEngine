@@ -5,5 +5,8 @@
     "font_speed": 100,
     "font_weight": 50,
     "font_italic": 0,
-    "font_bold": 0
+    "font_bold": 0,
+    "port": 2333,
+    "address": "127.0.0.1",
+    "max_connection": 5
 }

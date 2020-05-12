@@ -2,7 +2,10 @@
     "name": "简体中文",
     "code": "zh_CN",
     "error": {
-        "platform_error": "当前运行平台错误！请确认当前运行平台是Windows平台，否则可能会出现不可预料的错误！"
+        "platform_error": "当前运行平台错误！请确认当前运行平台是Windows平台，否则可能会出现不可预料的错误！",
+        "failed_start_thread": "致命错误：启动绘图线程失败！请重启程序后重试！",
+        "failed_listen_port": "监听端口失败！请检查端口是否被其它程序占用",
+        "timeout": "连接超时，请检查网络连接后重试！"
     },
     "warning": {
         "platform_warning": "警告：当前平台不是Windows 8以上的平台，无法使用toast通知！"
@@ -13,7 +16,19 @@
         "sended_notification": "已发送初始化通知！",
         "shown_tray": "已显示通知区域图标！",
         "shown_window": "已显示主窗口！",
-        "closed_tray": "已关闭通知区域图标"
+        "shown_damaku": "已显示弹幕",
+        "closed_tray": "已关闭通知区域图标",
+        "successfully_start_thread": "启动绘图线程成功！",
+        "recived_data": "已获取传入弹幕内容：",
+        "started_thread": "已启动线程",
+        "finished_thread": "已关闭线程",
+        "successfully_listen_port": "监听端口成功！",
+        "close_connection": "已关闭连接",
+        "loaded_cert": "已加载证书",
+        "connected_client": "已连接客户端：",
+        "started_sock_thread": "已启用socket线程",
+        "generated_orig_label": "已生成原始弹幕",
+        "generated_final_label": "已生成最终弹幕"
     },
     "debug": {
         "created_action": "已创建菜单项",
@@ -37,6 +52,9 @@
         "setting_font_speed": "弹幕滚动速度：",
         "setting_font_weight": "字重：",
         "setting_font_italic": "斜体字：",
-        "setting_font_bold": "粗体字："
+        "setting_font_bold": "粗体字：",
+        "setting_address": "监听地址：",
+        "setting_port": "监听端口：",
+        "setting_max_connection": "最大连接数："
     }
 }

@@ -3,6 +3,10 @@ import sys
 import platform
 import json
 import logging
+import socket
+import random
+import time
+import ssl
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -17,7 +21,7 @@ else:
 	logging.basicConfig(format="%(asctime)s %(levelname)s:%(message)s",datefmt="%Y-%m-%d %H:%M:%S",level=logging.DEBUG)
 if os.path.exists("config.json")==False:
 	with open(file="config.json",mode="w",encoding="utf-8") as default_conf_witer:
-		default_conf_dic={"lang":"zh_CN"}
+		default_conf_dic={"lang":"zh_CN","font": "Microsoft YaHei","font_size": 15,"font_speed": 100,"font_weight": 50,"font_italic": 0,"font_bold": 0,"port": 2333,"address": "localhost","max_connection":5}
 		json.dump(obj=default_conf_dic,fp=default_conf_witer,indent=4,sort_keys=True)
 	logging.warning("No config file found, creating default config file...")
 with open(file="config.json",mode="r",encoding="utf-8") as config_reader:
@@ -30,6 +34,9 @@ class setting:
 	font_italic=bool(conf_dic["font_italic"])
 	font_bold=bool(conf_dic["font_bold"])
 	font_speed=int(conf_dic["font_speed"])
+	port=int(conf_dic["port"])
+	address=str(conf_dic["address"])
+	max_connection=int(conf_dic["max_connection"])
 	damaku_font=QFont(font,pointSize=font_size,weight=font_weight,italic=font_italic)
 	damaku_font.setBold(font_bold)
 	def update_setting(self,conf_dic:dict):
@@ -61,13 +68,27 @@ class lang:
 	main_translator.load(qt_main_translation)
 	class error:
 		platform_error=str(langdic["error"]["platform_error"])
+		failed_start_thread=str(langdic["error"]["failed_start_thread"])
+		failed_listen_port=str(langdic["error"]["failed_listen_port"])
+		timeout=str(langdic["error"]["timeout"])
 	class info:
 		loaded_conf=str(langdic["info"]["loaded_conf"])
 		current_sys=str(langdic["info"]["current_sys"])
 		sended_notification=str(langdic["info"]["sended_notification"])
 		shown_tray=str(langdic["info"]["shown_tray"])
 		shown_window=str(langdic["info"]["shown_window"])
+		shown_damaku=str(langdic["info"]["shown_damaku"])
 		closed_tray=str(langdic["info"]["closed_tray"])
+		successfully_start_thread=str(langdic["info"]["successfully_start_thread"])
+		started_thread=str(langdic["info"]["started_thread"])
+		finished_thread=str(langdic["info"]["finished_thread"])
+		successfully_listen_port=str(langdic["info"]["successfully_listen_port"])
+		close_connection=str(langdic["info"]["close_connection"])
+		loaded_cert=str(langdic["info"]["loaded_cert"])
+		connected_client=str(langdic["info"]["connected_client"])
+		started_sock_thread=str(langdic["info"]["started_sock_thread"])
+		generated_orig_label=str(langdic["info"]["generated_orig_label"])
+		generated_final_label=str(langdic["info"]["generated_final_label"])
 	class warning:
 		platform_warning=str(langdic["warning"]["platform_warning"])
 	class debug:
@@ -93,6 +114,9 @@ class lang:
 		font_weight=str(langdic["ui"]["setting_font_weight"])
 		font_italic=str(langdic["ui"]["setting_font_italic"])
 		font_bold=str(langdic["ui"]["setting_font_bold"])
+		address_label=str(langdic["ui"]["setting_address"])
+		port_label=str(langdic["ui"]["setting_port"])
+		max_connection=str(langdic["ui"]["setting_max_connection"])
 logging.info(lang.info.loaded_conf)
 
 try:
@@ -108,6 +132,8 @@ else:
 	is_win10=False
 	logging.warning(lang.warning.platform_warning)
 logging.info(lang.info.current_sys+sys_ver)
+class share:
+	recv_data=""
 class SettingDialog(QDialog):
 	def __init__(self):
 		super(SettingDialog,self).__init__()
@@ -181,6 +207,27 @@ class SettingDialog(QDialog):
 		else:
 			self.font_bold_text.setCurrentIndex(1)
 		self.font_bold_text.setFont(font)
+		address_label=QLabel(lang.setting_ui.address_label)
+		address_label.setFont(font)
+		address_label.setStyleSheet("QLabel{border:1px solid gray;width:15px;border-radius:10px;padding:2px 4px;background:#00CED1;}")
+		self.address_text=QLineEdit(str(setting.address))
+		self.address_text.setFont(font)
+		self.address_text.setAlignment(Qt.AlignCenter)
+		self.address_text.setStyleSheet("QLineEdit{border:1px solid gray;width:30px;border-radius:10px;padding:2px 4px;}")
+		port_label=QLabel(lang.setting_ui.port_label)
+		port_label.setFont(font)
+		port_label.setStyleSheet("QLabel{border:1px solid gray;width:15px;border-radius:10px;padding:2px 4px;background:#00CED1;}")
+		self.port_text=QLineEdit(str(setting.port))
+		self.port_text.setFont(font)
+		self.port_text.setAlignment(Qt.AlignCenter)
+		self.port_text.setStyleSheet("QLineEdit{border:1px solid gray;width:30px;border-radius:10px;padding:2px 4px;}")
+		max_connection_label=QLabel(lang.setting_ui.max_connection)
+		max_connection_label.setFont(font)
+		max_connection_label.setStyleSheet("QLabel{border:1px solid gray;width:15px;border-radius:10px;padding:2px 4px;background:#00CED1;}")
+		self.max_connection_text=QLineEdit(str(setting.max_connection))
+		self.max_connection_text.setFont(font)
+		self.max_connection_text.setAlignment(Qt.AlignCenter)
+		self.max_connection_text.setStyleSheet("QLineEdit{border:1px solid gray;width:30px;border-radius:10px;padding:2px 4px;}")
 		save_button=QPushButton(lang.setting_ui.save)
 		save_button.setFont(font)
 		save_button.setStyleSheet("QPushButton{background:#6DDF6D;border-radius:5px;}QPushButton:hover{background:green;}")
@@ -196,6 +243,9 @@ class SettingDialog(QDialog):
 		font_speed_layout=QHBoxLayout()
 		font_italic_layout=QHBoxLayout()
 		font_bold_layout=QHBoxLayout()
+		address_layout=QHBoxLayout()
+		port_layout=QHBoxLayout()
+		max_connection_layout=QHBoxLayout()
 		button_layout=QHBoxLayout()
 		dialog_layout=QVBoxLayout()
 		lang_layout.addWidget(lang_label)
@@ -212,6 +262,12 @@ class SettingDialog(QDialog):
 		font_italic_layout.addWidget(self.font_italic_text)
 		font_bold_layout.addWidget(font_bold_label)
 		font_bold_layout.addWidget(self.font_bold_text)
+		address_layout.addWidget(address_label)
+		address_layout.addWidget(self.address_text)
+		port_layout.addWidget(port_label)
+		port_layout.addWidget(self.port_text)
+		max_connection_layout.addWidget(max_connection_label)
+		max_connection_layout.addWidget(self.max_connection_text)
 		button_layout.addWidget(save_button)
 		button_layout.addWidget(cancel_button)
 		dialog_layout.addWidget(setting_title_label)
@@ -222,6 +278,9 @@ class SettingDialog(QDialog):
 		dialog_layout.addLayout(font_italic_layout)
 		dialog_layout.addLayout(font_bold_layout)
 		dialog_layout.addLayout(font_speed_layout)
+		dialog_layout.addLayout(address_layout)
+		dialog_layout.addLayout(port_layout)
+		dialog_layout.addLayout(max_connection_layout)
 		dialog_layout.addLayout(button_layout)
 		self.setLayout(dialog_layout)
 	def get_lang(self):
@@ -245,7 +304,7 @@ class SettingDialog(QDialog):
 		else:
 			raise ValueError
 	def save_setting(self):
-		new_conf_dic={"lang":str(self.lang_code_list.index(self.lang_chooser.currentIndex())),"font":str(self.font_chooser.currentFont.family()),"font_size":int(self.font_size_text.text()),"font_speed":int(self.font_speed_text.text()),"font_weight":int(self.font_weight_text.text()),"font_italic":int(self.get_fixed_value(self.font_italic_text.currentIndex())),"font_bold":int(self.get_fixed_value(self.font_bold_text.currentIndex()))}
+		new_conf_dic={"lang":str(self.lang_code_list.index(self.lang_chooser.currentIndex())),"font":str(self.font_chooser.currentFont.family()),"font_size":int(self.font_size_text.text()),"font_speed":int(self.font_speed_text.text()),"font_weight":int(self.font_weight_text.text()),"font_italic":int(self.get_fixed_value(self.font_italic_text.currentIndex())),"font_bold":int(self.get_fixed_value(self.font_bold_text.currentIndex())),"port":int(self.port_text.text()),"address":str(self.address_text.text()),"max_connection":int(self.max_connection_text.text())}
 		with open(file="config.json",mode="w",encoding="utf-8") as new_conf_writer:
 			json.dump(obj=new_conf_dic,fp=new_conf_writer,indent=4,sort_keys=True)
 class TrayIcon(QSystemTrayIcon):
@@ -283,14 +342,63 @@ class main_window(QMainWindow):
 		self.setAttribute(Qt.WA_TranslucentBackground)
 		self.setWindowFlag(Qt.FramelessWindowHint)
 		self.setWindowFlag(Qt.Tool)
-		screen=QApplication.desktop()
-		screen_size=QSize(screen.width(),screen.height())
+		self.screen=QApplication.desktop().availableGeometry()
+		self.screen_size=QSize(self.screen.width(),self.screen.height())
 		self.raise_()
-
-
-
+		self.setGeometry(0,0,self.screen.width(),self.screen.height())
+class damaku(QLabel):
+	def __init__(self,text:str):
+		super(damaku,self).__init__()
+		self.setFont(setting.damaku_font)
+		self.setText(text)
+		self.setAttribute(Qt.WA_TranslucentBackground,False)
+		style="QLabel{color:rgba("+str(random.randint(0,255))+","+str(random.randint(0,255))+","+str(random.randint(0,255))+","+str(random.randint(0,255))+");}"
+		self.setStyleSheet(style)
+		logging.info(lang.info.generated_orig_label)
+		self.anim2=QPropertyAnimation(self)
+		self.anim2.setDuration(int(10000*(setting.font_speed/100)))
+		self.screen=QApplication.desktop().availableGeometry()
+		self.screen_x=int(self.screen.width())
+		self.screen_y=int(self.screen.height())
+		self.font_y=setting.damaku_font.pointSize()
+		pos_y=random.randint(0,self.screen_y-self.font_y)
+		self.anim2.setStartValue(QPoint(self.screen_x,pos_y))
+		self.anim2.setEndValue(QPoint(0,pos_y))
+		self.anim2.setEasingCurve(QEasingCurve.Linear)
+		self.anim2.finished.connect(self.anim2.deleteLater)
+		self.anim2.start(QAbstractAnimation.DeleteWhenStopped)
+		logging.info(lang.info.generated_final_label)
 app=QApplication(sys.argv)
 app.setQuitOnLastWindowClosed(False)
+tcp_socket=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+tcp_socket.bind((setting.address,setting.port))
+tcp_socket.listen(setting.max_connection)
+logging.info(lang.info.successfully_listen_port)
+class process_work(QObject):
+	def __init__(self,tcp_socket):
+		super(process_work,self).__init__()
+		self.tcp_socket=tcp_socket
+	def connection_process(self):
+		self.connect,self.address=self.tcp_socket.accept()
+		while True:
+			try:
+				damaku_act=damaku(self.connect.recv(1024).decode("utf-8"))
+			except ConnectionResetError:
+				logging.info(lang.info.close_connection)
+				self.connect.send("{\"status\":\"failed\",\"code\":0}".encode("utf-8"))
+				break
+			else:
+				logging.info(lang.info.connected_client+str(self.address))
+				self.connect.send("{\"status\":\"accepted\",\"code\":1}".encode("utf-8"))
+				damaku_act.show()
+				logging.info(lang.info.shown_damaku)
+		self.connect.close()
+process=process_work(tcp_socket)
+process_socket_thread=QThread()
+process.moveToThread(process_socket_thread)
+process_socket_thread.started.connect(process.connection_process)
+process_socket_thread.start()
+logging.info(lang.info.started_sock_thread)
 tray_icon=TrayIcon()
 if is_win10==True:
 	toaster=win10toast.ToastNotifier()
@@ -299,6 +407,7 @@ if is_win10==True:
 else:
 	tray_icon.showMessage(lang.notification.title,lang.notification.msg,QIcon("resources/program.ico"),5000)
 logging.info(lang.info.sended_notification)
+time.sleep(5)
 tray_icon.show()
 logging.info(lang.info.shown_tray)
 w=main_window()
