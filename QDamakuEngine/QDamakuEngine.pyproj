@@ -17,6 +17,7 @@
     <TestFramework>pytest</TestFramework>
     <UnitTestPattern>test*.py</UnitTestPattern>
     <UnitTestRootDirectory>.</UnitTestRootDirectory>
+    <IsWindowsApplication>False</IsWindowsApplication>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -45,6 +46,7 @@
     <Content Include="lang\zh_CN\qt_zh_CN.qm" />
     <Content Include="lang\zh_CN\widgets_zh_CN.qm" />
     <Content Include="lang\zh_CN\zh_CN.json" />
+    <Content Include="README.md" />
     <Content Include="requirements.txt" />
     <Content Include="resources\exit.png" />
     <Content Include="resources\program.ico" />

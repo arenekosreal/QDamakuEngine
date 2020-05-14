@@ -5,10 +5,13 @@
         "platform_error": "当前运行平台错误！请确认当前运行平台是Windows平台，否则可能会出现不可预料的错误！",
         "failed_start_thread": "致命错误：启动绘图线程失败！请重启程序后重试！",
         "failed_listen_port": "监听端口失败！请检查端口是否被其它程序占用",
-        "timeout": "连接超时，请检查网络连接后重试！"
+        "timeout": "连接超时，请检查网络连接后重试！",
+        "recived_close_connection": "接受到关闭连接数据！这个问题原因是socket使用空数据作为关闭连接的标志。",
+        "io_error": "数据传输出错！请重启服务器！"
     },
     "warning": {
-        "platform_warning": "警告：当前平台不是Windows 8以上的平台，无法使用toast通知！"
+        "platform_warning": "警告：当前平台不是Windows 8以上的平台，无法使用toast通知！",
+        "aborted_connection": "警告：连接已终止！"
     },
     "info": {
         "loaded_conf": "读取配置文件完成！",
@@ -33,7 +36,8 @@
     "debug": {
         "created_action": "已创建菜单项",
         "created_menu": "已创建菜单",
-        "enabled_toast": "启用新版Windows通知"
+        "enabled_toast": "启用新版Windows通知",
+        "used_color": "已生成随机颜色："
     },
     "ui": {
         "notification_title": "启动成功！",
@@ -45,6 +49,7 @@
         "no": "否",
         "save": "保存(&A)",
         "cancel": "取消(&C)",
+        "restore": "恢复默认(&D)",
         "setting_title": "设置",
         "setting_lang_label": "语言：",
         "setting_font_label": "弹幕字体：",
@@ -55,6 +60,7 @@
         "setting_font_bold": "粗体字：",
         "setting_address": "监听地址：",
         "setting_port": "监听端口：",
-        "setting_max_connection": "最大连接数："
+        "setting_max_connection": "最大连接数：",
+        "alpha_label": "透明度："
     }
 }
