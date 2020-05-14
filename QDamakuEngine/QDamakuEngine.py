@@ -10,11 +10,10 @@ import ssl
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
-is_debug=True
-#if sys.argv[0]=="--debug":
-#	is_debug=True
-#else:
-#	is_debug=False
+if sys.argv[0].upper()=="--DEBUG":
+	is_debug=True
+else:
+	is_debug=False
 if is_debug==False:
 	logging.basicConfig(filename="QDE.log",filemode="w",format="%(asctime)s %(levelname)s:%(message)s",datefmt="%Y-%m-%d %H:%M:%S",level=logging.INFO)
 else:
@@ -140,8 +139,6 @@ else:
 	is_win10=False
 	logging.warning(lang.warning.platform_warning)
 logging.info(lang.info.current_sys+sys_ver)
-class share:
-	recv_data=""
 class SettingDialog(QDialog):
 	def __init__(self):
 		super(SettingDialog,self).__init__()
@@ -239,12 +236,15 @@ class SettingDialog(QDialog):
 		alpha_label=QLabel(lang.setting_ui.alpha_label)
 		alpha_label.setFont(font)
 		alpha_label.setStyleSheet("QLabel{border:1px solid gray;width:15px;border-radius:10px;padding:2px 4px;background:#00CED1;}")
-		self.alpha_text=QSlider(Qt.Horizontal)
+		self.alpha_text=EnhancedSlider()
+		self.alpha_text.setOrientation(Qt.Horizontal)
 		self.alpha_text.setFont(font)
-		self.alpha_text.setStyleSheet("QSlider{border:1px solid gray;width:15px;border-radius:10px;padding:2px 4px;}")
+		self.alpha_text.setStyleSheet("QSlider{background-color:transparent;border:1px solid gray;width:5px;border-radius:10px;padding:2px 4px;}QSlider::handle:horizontal{border:1px;border-image:url(resources/slider.png);width:30px;}QSlider::add-page:horizontal{background:#00CED1;}QSlider::sub-page:horizontal{background:white;}")
 		self.alpha_text.setMinimum(0)
 		self.alpha_text.setMaximum(100)
 		self.alpha_text.setValue(int(setting.color_alpha*100))
+		self.alpha_text.setSingleStep(10)
+		self.alpha_text.setTickPosition(QSlider.TicksAbove)
 		save_button=QPushButton(lang.setting_ui.save)
 		save_button.setFont(font)
 		save_button.setStyleSheet("QPushButton{background:#6DDF6D;border-radius:5px;}QPushButton:hover{background:green;}")
@@ -417,6 +417,33 @@ class damaku(QLabel):
 		logging.info(lang.info.generated_final_label)
 	def finish_play(self):
 		self.deleteLater()
+class EnhancedSlider(QSlider):
+	def __init__(self):
+		super(EnhancedSlider,self).__init__()
+		self.value_label=QLabel(self)
+		self.value_label.setFixedSize(QSize(25,25))
+		self.value_label.setAutoFillBackground(True)
+		self.value_label.setAlignment(Qt.AlignCenter)
+		self.value_label.setVisible(False)
+		self.value_label.move(0,0)
+		self.value_label.setWindowFlag(Qt.FramelessWindowHint)
+		self.value_label.setWindowFlag(Qt.Tool)
+		self.value_label.setAttribute(Qt.WA_TranslucentBackground)
+		self.value_label.adjustSize()
+		self.value_label.setStyleSheet("QLabel{border:1px solid gray;width:25px;border-radius:10px;padding:2px 4px;}")
+	def mousePressEvent(self, QMouseEvent):
+		if self.value_label.isVisible()==False:
+			self.value_label.setVisible(True)
+		self.value_label.setText(str(self.value()))
+		QSlider.mousePressEvent(self,QMouseEvent)
+	def mouseReleaseEvent(self,QMouseEvent):
+		if self.value_label.isVisible()==True:
+			self.value_label.setVisible(False)
+		QSlider.mouseReleaseEvent(self,QMouseEvent)
+	def mouseMoveEvent(self,QMouseEvent):
+		self.value_label.setText(str(self.value()))
+		self.value_label.move(int(self.pos().x()+self.parent().x()+(self.width()-self.value_label.width())*self.value()/(self.maximum()-self.minimum())),self.pos().y()+self.parent().y()-8)
+		QSlider.mouseMoveEvent(self,QMouseEvent)
 app=QApplication(sys.argv)
 app.setQuitOnLastWindowClosed(False)
 tray_icon=TrayIcon()
