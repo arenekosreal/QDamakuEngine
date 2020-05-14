@@ -11,4 +11,4 @@ The original goal is developing a Damaku Notification Software, but I find it is
 
 ## How to use
 
-It is in early developing so I don't have the idea about how to use it. I will update as soon as possible.
+Start this script and it will listen on address and port which you have set in setting dialog. The default setting is 127.0.0.1:2333. Then, send information to that port and address and finally, data will be shown on screen as a danmaku.
