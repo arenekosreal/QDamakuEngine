@@ -10,7 +10,7 @@ import ssl
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
-if sys.argv[0].upper()=="--DEBUG":
+if sys.argv[1].upper()=="--DEBUG":
 	is_debug=True
 else:
 	is_debug=False
