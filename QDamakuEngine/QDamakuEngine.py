@@ -410,7 +410,7 @@ class damaku(QLabel):
 		self.font_y=setting.damaku_font.pointSize()
 		pos_y=random.randint(0,self.screen_y-self.font_y)
 		self.anim2.setStartValue(QPoint(self.screen_x,pos_y))
-		self.anim2.setEndValue(QPoint(0,pos_y))
+		self.anim2.setEndValue(QPoint(0-self.font_y,pos_y))
 		self.anim2.setEasingCurve(QEasingCurve.Linear)
 		self.anim2.finished.connect(self.finish_play)
 		self.anim2.start(QAbstractAnimation.DeleteWhenStopped)
