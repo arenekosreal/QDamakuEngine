@@ -463,29 +463,34 @@ logging.info(lang.info.successfully_listen_port)
 class process_work(QObject):
 	def __init__(self,tcp_socket):
 		super(process_work,self).__init__()
+		context=ssl.SSLContext()
+		context.load_cert_chain(keyfile="cert/key.pem",certfile="cert/cert.pem")
 		self.tcp_socket=tcp_socket
+		self.tcp_socket=context.wrap_socket(sock=self.tcp_socket,server_side=True)
+		logging.info(lang.info.loaded_cert)
 	def connection_process(self):
-		connect,address=self.tcp_socket.accept()
 		while True:
-			try:
-				data=connect.recv(1024).decode("utf-8")
-			except ConnectionResetError:
-				logging.info(lang.info.close_connection)
-				connect.close()
-			except ConnectionAbortedError:
-				logging.warning(lang.warning.aborted_connection)
-				connect.close()
-			except IOError:
-				logging.error(lang.error.io_error)
-				connect.close()
-				break
-			else:
-				if data=="":
-					connect.close()
-				w.update_signal.emit(data)
-				logging.info(lang.info.connected_client+str(address))
-				connect.send(("{\"status\":\"accepted\",\"code\":1,\"data\":"+data+"}").encode("utf-8"))
-				logging.info(lang.info.recived_data+str(data))
+			connect,address=self.tcp_socket.accept()
+			while True:
+				try:
+					data=connect.recv(1024).decode("utf-8")
+				except ConnectionResetError:
+					logging.info(lang.info.close_connection)
+					break
+				except ConnectionAbortedError:
+					logging.warning(lang.warning.aborted_connection)
+					break
+				except IOError:
+					logging.error(lang.error.io_error)
+					break
+				else:
+					if data=="":
+						connect.close()
+					w.update_signal.emit(data)
+					logging.info(lang.info.connected_client+str(address))
+					connect.send(("{\"status\":\"accepted\",\"code\":1,\"data\":"+data+"}").encode("utf-8"))
+					logging.info(lang.info.recived_data+str(data))
+			connect.close()
 process=process_work(tcp_socket)
 process_socket_thread=QThread()
 process.moveToThread(process_socket_thread)
