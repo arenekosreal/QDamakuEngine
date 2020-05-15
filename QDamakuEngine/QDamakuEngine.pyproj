@@ -43,6 +43,8 @@
     </Interpreter>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="cert\cert.pem" />
+    <Content Include="cert\key.pem" />
     <Content Include="config.json" />
     <Content Include="lang\zh_CN\qt_zh_CN.qm" />
     <Content Include="lang\zh_CN\widgets_zh_CN.qm" />
@@ -53,6 +55,7 @@
     <Content Include="resources\setting.png" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="cert\" />
     <Folder Include="lang\" />
     <Folder Include="lang\zh_CN\" />
     <Folder Include="resources\" />
