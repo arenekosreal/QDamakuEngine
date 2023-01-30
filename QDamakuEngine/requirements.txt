@@ -5,4 +5,4 @@ PyQt5-sip==12.7.2
 pywin32==301
 setuptools==65.5.1
 win10toast==0.9
-wheel==0.34.2
+wheel==0.38.1
