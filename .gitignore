@@ -1,0 +1,9 @@
+dist
+.coverage
+.pytest_cache
+pyrightconfig.json
+__pycache__
+config.toml
+config.json
+config.yaml
+config.yml
