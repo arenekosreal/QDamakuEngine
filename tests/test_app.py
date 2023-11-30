@@ -1,12 +1,21 @@
-import pytest
+from PySide6.QtCore import QThread
+from PySide6.QtWidgets import QWidget
 from pytestqt.qtbot import QtBot
-from qdamakuengine.app import App
-from qdamakuengine.config import get_config
+from qdamakuengine.app import App, _DamakuDistributionSmoothly
 
 
-@pytest.mark.skip
-def test_app(qtbot: QtBot):
-    app = App()
-    app.show()
-    qtbot.addWidget(app)
-    config = get_config()
+def test_distribution(qtbot: QtBot):
+    widget = QWidget()
+    thread = QThread(widget)
+    job = _DamakuDistributionSmoothly()
+    thread.started.connect(job.start)
+    job.moveToThread(thread)
+    thread.start()
+    widget.show()
+    with qtbot.waitSignal(job.damakuupdated, timeout=10000):
+        job.add("Test-Damaku", "Pytest")
+    job.stop()
+    qtbot.addWidget(widget)
+    thread.quit()
+    while not thread.isFinished():
+        thread.wait()

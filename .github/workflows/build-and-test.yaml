@@ -29,14 +29,10 @@ jobs:
         uses: Gr1N/setup-poetry@v8
       - name: Install package
         run: poetry install --with=dev
-      - name: Install Qt
-        # See https://github.com/cbrnr/mnelab/issues/327#issuecomment-1074853392
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            libxcb-icccm4 libxcb-image0 libxcb-keysyms1 \
-            libxkbcommon-x11-0 xvfb libxcb-randr0 \
-            libxcb-render-util0 libxcb-xinerama0 libegl1
+      - name: Setup Headless Display
+        uses: pyvista/setup-headless-display-action@v2
+        with:
+          qt: true
       - name: Run test
         run: poetry run pytest --cov=qdamakuengine
       - name: Build wheel
