@@ -34,7 +34,7 @@ jobs:
         with:
           qt: true
       - name: Run test
-        run: poetry run pytest --cov=qdamakuengine
+        run: poetry run pytest --cov=qdamakuengine -s -vvvv
       - name: Build wheel
         run: poetry build
       - name: Release
