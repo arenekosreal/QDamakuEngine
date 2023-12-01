@@ -79,14 +79,6 @@ class Damaku(QLabel):
             animation.start(
                 QAbstractAnimation.DeletionPolicy.DeleteWhenStopped)
         else:
-            if self.width() > parent.width():
-                k = parent.width()/self.width()
-                self.resize(
-                    round(parent.width() *
-                          self._config.too_large_static_damaku_fix_ratio),
-                    round(self.height()*k *
-                          self._config.too_large_static_damaku_fix_ratio)
-                )
             position_x = round((parent.width()-self.width())/2)
             debug("Creating static damaku at (%d,%d)" %
                   (position_x, position_y))

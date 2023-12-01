@@ -44,11 +44,11 @@ class UIConfig(BaseConfig):
 class DamakuConfig(BaseConfig):
     damaku_speed = 5
     damaku_size_min = 20
-    damaku_size_max = 40
+    damaku_size_max = 30
     moving_weight = 0.8
     static_weight = 0.2
-    too_large_static_damaku_fix_ratio = 0.6
     static_damaku_time_ratio = 0.2
+    damaku_send_wait_secs = 0.1
 
 
 class NetworkConfig(BaseConfig):

@@ -19,8 +19,11 @@ _object_names: dict[str, str] = {
 class _DamakuDistributionSmoothly(QObject):
     _damakus: list[tuple[str, str]] = []
     _running = False
-    _DAMAKU_SEND_WAIT_SECS = 0.1
     damakuupdated = Signal(str, str)
+
+    def __init__(self) -> None:
+        super().__init__()
+        self._damaku_send_wait_secs = get_config().damaku.damaku_send_wait_secs
 
     def add(self, damaku: str, sender: str):
         self._damakus.append((damaku, sender))
@@ -32,7 +35,7 @@ class _DamakuDistributionSmoothly(QObject):
                 self.damakuupdated.emit(
                     *self._damakus.pop(0)
                 )
-            time.sleep(self._DAMAKU_SEND_WAIT_SECS)
+            time.sleep(self._damaku_send_wait_secs)
 
     def stop(self):
         self._running = False
