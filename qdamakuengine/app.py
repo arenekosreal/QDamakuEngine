@@ -1,8 +1,7 @@
 import json
-import time
 import random
 from typing import Any
-from PySide6.QtCore import QObject, QThread, Qt, Signal, Slot
+from PySide6.QtCore import QObject, QThread, QTimerEvent, Qt, Signal, Slot
 from PySide6.QtWidgets import QFrame, QGraphicsDropShadowEffect, QMenu, QVBoxLayout, QWidget
 from PySide6.QtGui import QMouseEvent, QContextMenuEvent
 from PySide6.QtNetwork import QHostAddress, QLocalServer, QTcpServer, QTcpSocket
@@ -17,28 +16,42 @@ _object_names: dict[str, str] = {
 
 
 class _DamakuDistributionSmoothly(QObject):
-    _damakus: list[tuple[str, str]] = []
-    _running = False
     damakuupdated = Signal(str, str)
+    add = Signal(str, str)
+    start = Signal()
+    started = Signal()
+    stop = Signal()
+    stopped = Signal()
 
     def __init__(self) -> None:
         super().__init__()
         self._damaku_send_wait_secs = get_config().damaku.damaku_send_wait_secs
+        self._damakus: list[tuple[str, str]] = []
+        self.start.connect(self._start)
+        self.stop.connect(self._stop)
+        self.add.connect(self._add)
+        self._timer_id = 0
 
-    def add(self, damaku: str, sender: str):
+    @Slot(str, str)
+    def _add(self, damaku: str, sender: str):
         self._damakus.append((damaku, sender))
 
-    def start(self):
-        self._running = True
-        while self._running:
-            if len(self._damakus) > 0:
-                self.damakuupdated.emit(
-                    *self._damakus.pop(0)
-                )
-            time.sleep(self._damaku_send_wait_secs)
+    @Slot()
+    def _start(self):
+        self._timer_id = self.startTimer(int(1000*self._damaku_send_wait_secs))
+        self.started.emit()
 
-    def stop(self):
-        self._running = False
+    @Slot()
+    def _stop(self):
+        self.killTimer(self._timer_id)
+        self.stopped.emit()
+
+    def timerEvent(self, event: QTimerEvent) -> None:
+        if event.timerId() == self._timer_id and len(self._damakus) > 0:
+            self.damakuupdated.emit(
+                *self._damakus.pop(0)
+            )
+        return super().timerEvent(event)
 
 
 class _FramelessWindowWidget(QWidget):
@@ -86,37 +99,17 @@ class App(_FramelessWindowWidget):
 
         self.dthread = QThread(self)
         self.djob = _DamakuDistributionSmoothly()
-        self.dthread.started.connect(self.djob.start)
+        self.dthread.started.connect(self.djob.start.emit)
         self.djob.damakuupdated.connect(self.play_damaku)
         self.djob.moveToThread(self.dthread)
-        info("Starting distribution thread...")
-        self.dthread.start()
-        try:
-            info("Starting socket server...")
-            if self._config.network.address.startswith("local://"):
-                self.socket = QLocalServer(self)
-                self.socket.listen(
-                    self._config.network.address.removeprefix("local://"))
-                address = self.socket.serverName()
-            elif self._config.network.address.startswith("tcp://"):
-                self.socket = QTcpServer(self)
-                self.socket.listen(
-                    QHostAddress(
-                        self._config.network.address.removeprefix("tcp://")),
-                    self._config.network.port
-                )
-                address = "tcp://%s:%s" % (
-                    self.socket.serverAddress().toString(), self.socket.serverPort())
-            else:
-                raise RuntimeError("Unable to listen %s:%d" %
-                                   (self._config.network.address, self._config.network.port))
 
-        except:
-            error("Failed to listen socket.")
-            raise
+        if self._config.network.address.startswith("local://"):
+            self.socket = QLocalServer(self)
+        elif self._config.network.address.startswith("tcp://"):
+            self.socket = QTcpServer(self)
         else:
-            self.socket.newConnection.connect(self.handle)
-            info("Bind to %s successfully." % address)
+            raise RuntimeError(
+                "Unable to listen to socket, please check your config.")
 
     @Slot(str, str)
     def play_damaku(self, text: str, sender: str):
@@ -163,7 +156,7 @@ class App(_FramelessWindowWidget):
                                 sender = client.localAddress().toString()
                             else:
                                 sender = "localhost"
-                            self.djob.add(damaku, sender)
+                            self.djob.add.emit(damaku, sender)
                         else:
                             info("No damaku in data")
                             response["result"] = _err_no_damaku
@@ -176,6 +169,29 @@ class App(_FramelessWindowWidget):
         client.readyRead.connect(read)
 
     def show(self) -> None:
+        info("Starting distribution thread...")
+        self.dthread.start()
+        info("Starting socket server...")
+        try:
+            if isinstance(self.socket, QLocalServer):
+                self.socket.listen(
+                    self._config.network.address.removeprefix("local://"))
+                address = self.socket.serverName()
+            else:
+                self.socket.listen(
+                    QHostAddress(
+                        self._config.network.address.removeprefix("tcp://")),
+                    self._config.network.port
+                )
+                address = "tcp://%s:%s" % (
+                    self.socket.serverAddress().toString(), self.socket.serverPort())
+
+        except:
+            error("Failed to listen socket.")
+            raise
+        else:
+            self.socket.newConnection.connect(self.handle)
+            info("Bind to %s successfully." % address)
         self.container.show()
         return self.showFullScreen() if self._config.ui.fullscreen else super().show()
 
@@ -183,9 +199,9 @@ class App(_FramelessWindowWidget):
         info("Closing socket...")
         self.socket.close()
         info("Closing distribution thread...")
-        self.djob.stop()
+        self.djob.stop.emit()
         self.dthread.quit()
-        while not self.dthread.isFinished():
+        if not self.dthread.isFinished():
             info("Waiting distribution to be closed...")
             self.dthread.wait()
         info("Closing App...")
@@ -193,7 +209,7 @@ class App(_FramelessWindowWidget):
 
     def contextMenuEvent(self, event: QContextMenuEvent) -> None:
         menu = QMenu(self)
-        menu.addAction("&Exit", self.close)  # type: ignore
+        menu.addAction(self.tr("&Exit"), self.close)  # type: ignore
         menu.move(event.pos())
         menu.show()
         return super().contextMenuEvent(event)
