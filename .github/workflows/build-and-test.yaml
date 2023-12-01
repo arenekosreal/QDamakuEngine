@@ -29,6 +29,8 @@ jobs:
         uses: Gr1N/setup-poetry@v8
       - name: Install package
         run: poetry install --with=dev
+      - name: Setup QT Libs
+        uses: tlambert03/setup-qt-libs
       - name: Setup Headless Display
         uses: pyvista/setup-headless-display-action@v2
         with:
