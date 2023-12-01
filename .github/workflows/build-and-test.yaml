@@ -33,7 +33,10 @@ jobs:
         uses: pyvista/setup-headless-display-action@v2
         with:
           qt: true
+          pyvista: false
       - name: Run test
+        env:
+          QT_DEBUG_PLUGINS: '1'
         run: poetry run pytest --cov=qdamakuengine -s -vvvv
       - name: Build wheel
         run: poetry build
