@@ -48,3 +48,9 @@ And you should received the response like this:
 }
 ```
 When there is something wrong, you need to check result code and message for detailed info.
+
+# Test
+
+Run `poetry install --with=dev` to install pytest and its plugins, then run `poetry run pytest`.
+
+Running `poetry run pytest --cov=qdamakuengine` to get test coverage report.
