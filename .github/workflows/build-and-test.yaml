@@ -30,7 +30,7 @@ jobs:
       - name: Install package
         run: poetry install --with=dev
       - name: Setup QT Libs
-        uses: tlambert03/setup-qt-libs
+        uses: tlambert03/setup-qt-libs@v1
       - name: Setup Headless Display
         uses: pyvista/setup-headless-display-action@v2
         with:
