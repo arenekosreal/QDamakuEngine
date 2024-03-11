@@ -17,7 +17,7 @@ python-magic-bin = {version = "^0.4.14", markers = "sys_platform == 'win32'"}
 
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^8.0.2"
+pytest = "^8.1.1"
 pytest-cov = "^4.1.0"
 tomli-w = "^1.0.0"
 pytest-qt = "^4.4.0"
