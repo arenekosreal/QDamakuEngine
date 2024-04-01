@@ -11,7 +11,7 @@ qdamakuengine = "qdamakuengine.__main__:start"
 
 [tool.poetry.dependencies]
 python = ">=3.11,<3.13"
-pyside6 = "^6.6.2"
+pyside6 = "^6.6.3"
 python-magic = {version = "^0.4.27", markers = "sys_platform != 'win32'"}
 python-magic-bin = {version = "^0.4.14", markers = "sys_platform == 'win32'"}
 
